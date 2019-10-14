@@ -62,8 +62,7 @@ class PhabricatorDifferentialPostJob(
                 log.debug("Comment $ic has been published")
               } catch (e: ConduitException) {
                 if (e.message.equals("Requested file doesn't exist in this revision.")) {
-                  val message = "Unmodified file $filePath  on line ${i.line()}\n\n $ic"
-                  differentialClient.postComment(diff.revisionId, message, false)
+                  log.info(e.message)
                 } else {
                   log.error(e.message, e)
                 }
@@ -71,6 +70,7 @@ class PhabricatorDifferentialPostJob(
           }
         }
       }
+      log.info("=== Process issue number: {} ===", context?.issues()?.count())
       differentialClient.postComment(diff.revisionId, globalReportBuilder.summarize())
       log.info("Analysis result has been published to your differential revision")
     } catch (e: ConduitException) {

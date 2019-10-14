@@ -71,7 +71,7 @@ class DifferentialClient(val conduitClient: ConduitClient) {
    */
   @Throws(ConduitException::class)
   fun postComment(revisionID: String, message: String, attachInlines: Boolean = true): JSONObject {
-    return postComment(revisionID, message, false, "none", attachInlines)
+    return postComment(revisionID, message, true, "none", attachInlines)
   }
 
   /**

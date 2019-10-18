@@ -58,6 +58,14 @@ class DifferentialClient(val conduitClient: ConduitClient) {
     diff.revisionId = diffJsonObj.getString("revisionID")
     diff.dateCreated = Date(diffJsonObj.getLong("dateCreated"))
     diff.dateModified = Date(diffJsonObj.getLong("dateModified"))
+    val changedFiles = ArrayList<String>()
+    val changes = diffJsonObj.getJSONArray("changes")
+    for(i in 0..(changes.length()-1)) {
+      val item = changes[i] as JSONObject
+      val filePath = item.getString("currentPath")
+      changedFiles.add(filePath)
+    }
+    diff.changedFiles = changedFiles
     return diff
   }
 

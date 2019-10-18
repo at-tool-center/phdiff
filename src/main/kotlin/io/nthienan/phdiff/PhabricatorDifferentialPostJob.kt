@@ -58,15 +58,20 @@ class PhabricatorDifferentialPostJob(
                 globalReportBuilder.add(i)
                 val ic = inlineReportBuilder.issue(i).build()
                 val filePath = i.inputComponent().toString()
-                try {
-                  differentialClient.postInlineComment(diffID, filePath, i.line()!!, ic)
-                  log.debug("Comment $ic has been published")
-                } catch (e: ConduitException) {
-                  if (e.message.equals("Requested file doesn't exist in this revision.")) {
-                    log.info(e.message + "")
-                  } else {
-                    log.error(e.message + "", e)
+                if (diff.changedFiles.contains(filePath)) {
+                  log.info("File exist...{}", filePath)
+                  try {
+                    differentialClient.postInlineComment(diffID, filePath, i.line()!!, ic)
+                    log.debug("Comment $ic has been published")
+                  } catch (e: ConduitException) {
+                    if (e.message.equals("Requested file doesn't exist in this revision.")) {
+                      log.info(e.message + "")
+                    } else {
+                      log.error(e.message + "", e)
+                    }
                   }
+                } else {
+                  log.info("File {} not exist in this Differential...", filePath)
                 }
               }
           }

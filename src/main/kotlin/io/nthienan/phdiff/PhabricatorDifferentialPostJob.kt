@@ -54,17 +54,19 @@ class PhabricatorDifferentialPostJob(
           .sorted(issueComparator)
           .forEach { i ->
             run {
-              globalReportBuilder.add(i)
-              val ic = inlineReportBuilder.issue(i).build()
-              val filePath = i.inputComponent().toString()
-              try {
-                differentialClient.postInlineComment(diffID, filePath, i.line()!!, ic)
-                log.debug("Comment $ic has been published")
-              } catch (e: ConduitException) {
-                if (e.message.equals("Requested file doesn't exist in this revision.")) {
-                  log.info(e.message)
-                } else {
-                  log.error(e.message, e)
+              if(i?.ruleKey() != null && i.componentKey() != null && i.line() != null) {
+                globalReportBuilder.add(i)
+                val ic = inlineReportBuilder.issue(i).build()
+                val filePath = i.inputComponent().toString()
+                try {
+                  differentialClient.postInlineComment(diffID, filePath, i.line()!!, ic)
+                  log.debug("Comment $ic has been published")
+                } catch (e: ConduitException) {
+                  if (e.message.equals("Requested file doesn't exist in this revision.")) {
+                    log.info(e.message + "")
+                  } else {
+                    log.error(e.message + "", e)
+                  }
                 }
               }
           }
@@ -74,7 +76,7 @@ class PhabricatorDifferentialPostJob(
       differentialClient.postComment(diff.revisionId, globalReportBuilder.summarize())
       log.info("Analysis result has been published to your differential revision")
     } catch (e: ConduitException) {
-      log.error(e.message, e)
+      log.error(e.message + "", e)
     }
   }
 }
